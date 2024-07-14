@@ -15,19 +15,18 @@ public class Main {
         int b = positions[1];
         int c = positions[2];
         
+        // 최소 이동 횟수 계산
         int minMoves = 0;
         if (b - a == 1 && c - b == 1) {
-            // 이미 연속된 위치에 있는 경우
             minMoves = 0;
         } else if (b - a <= 2 || c - b <= 2) {
-            // 한 번의 이동으로 연속된 위치를 만들 수 있는 경우
             minMoves = 1;
         } else {
-            // 두 번의 이동이 필요한 경우
             minMoves = 2;
         }
         
-        int maxMoves = Math.max(b - a, c - b) - 1;
+        // 최대 이동 횟수 계산
+        int maxMoves = (c - b - 1) + (b - a - 1);
         
         System.out.println(minMoves);
         System.out.println(maxMoves);
