@@ -2,7 +2,8 @@ import java.util.*;
 
 public class Main {
 
-    private static int count = 0;
+    private static int[][] memo;
+    private static int count;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -20,29 +21,35 @@ public class Main {
         }
         scanner.close();
 
+        // Initialize memoization table
+        memo = new int[N][1 << N];
+        for (int i = 0; i < N; i++) {
+            Arrays.fill(memo[i], -1);
+        }
+
         // Calculate number of valid assignments
-        calculateAssignments(N, desiredSalaries, maxSalaries);
+        count = calculateAssignments(0, N, desiredSalaries, maxSalaries, 0);
         System.out.println(count);
     }
 
-    private static void calculateAssignments(int N, int[] desiredSalaries, int[] maxSalaries) {
-        boolean[] visited = new boolean[N];
-        Arrays.fill(visited, false);
-        backtrack(0, N, desiredSalaries, maxSalaries, visited);
-    }
-
-    private static void backtrack(int devIndex, int N, int[] desiredSalaries, int[] maxSalaries, boolean[] visited) {
+    private static int calculateAssignments(int devIndex, int N, int[] desiredSalaries, int[] maxSalaries, int mask) {
         if (devIndex == N) {
-            count++;
-            return;
+            return 1;
         }
-        
+
+        if (memo[devIndex][mask] != -1) {
+            return memo[devIndex][mask];
+        }
+
+        int totalWays = 0;
+
         for (int i = 0; i < N; i++) {
-            if (!visited[i] && desiredSalaries[devIndex] <= maxSalaries[i]) {
-                visited[i] = true;
-                backtrack(devIndex + 1, N, desiredSalaries, maxSalaries, visited);
-                visited[i] = false;
+            if ((mask & (1 << i)) == 0 && desiredSalaries[devIndex] <= maxSalaries[i]) {
+                totalWays += calculateAssignments(devIndex + 1, N, desiredSalaries, maxSalaries, mask | (1 << i));
             }
         }
+
+        memo[devIndex][mask] = totalWays;
+        return totalWays;
     }
 }
