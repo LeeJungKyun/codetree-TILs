@@ -1,9 +1,8 @@
-import java.util.*;
+import java.util.Scanner;
 
 public class Main {
 
-    private static int[][] memo;
-    private static int count;
+    private static int count = 0;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -21,35 +20,29 @@ public class Main {
         }
         scanner.close();
 
-        // Initialize memoization table
-        memo = new int[N][1 << N];
-        for (int i = 0; i < N; i++) {
-            Arrays.fill(memo[i], -1);
-        }
-
         // Calculate number of valid assignments
-        count = calculateAssignments(0, N, desiredSalaries, maxSalaries, 0);
+        calculateAssignments(N, desiredSalaries, maxSalaries);
         System.out.println(count);
     }
 
-    private static int calculateAssignments(int devIndex, int N, int[] desiredSalaries, int[] maxSalaries, int mask) {
+    private static void calculateAssignments(int N, int[] desiredSalaries, int[] maxSalaries) {
+        boolean[] visited = new boolean[N];
+        Arrays.fill(visited, false);
+        backtrack(0, N, desiredSalaries, maxSalaries, visited);
+    }
+
+    private static void backtrack(int devIndex, int N, int[] desiredSalaries, int[] maxSalaries, boolean[] visited) {
         if (devIndex == N) {
-            return 1;
+            count++;
+            return;
         }
-
-        if (memo[devIndex][mask] != -1) {
-            return memo[devIndex][mask];
-        }
-
-        int totalWays = 0;
-
+        
         for (int i = 0; i < N; i++) {
-            if ((mask & (1 << i)) == 0 && desiredSalaries[devIndex] <= maxSalaries[i]) {
-                totalWays += calculateAssignments(devIndex + 1, N, desiredSalaries, maxSalaries, mask | (1 << i));
+            if (!visited[i] && desiredSalaries[devIndex] <= maxSalaries[i]) {
+                visited[i] = true;
+                backtrack(devIndex + 1, N, desiredSalaries, maxSalaries, visited);
+                visited[i] = false;
             }
         }
-
-        memo[devIndex][mask] = totalWays;
-        return totalWays;
     }
 }
